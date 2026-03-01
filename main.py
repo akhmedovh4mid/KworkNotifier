@@ -35,11 +35,14 @@ async def main():
                 except Exception:
                     logging.exception("Ошибка контура мониторинга")
 
-                await asyncio.wait_for(
-                    shutdown_event.wait(),
-                    timeout=app_settings.polling_interval,
-                )
-
+                try:
+                    # Ждём либо сигнал завершения, либо таймаут
+                    await asyncio.wait_for(
+                        shutdown_event.wait(), timeout=app_settings.polling_interval
+                    )
+                except asyncio.TimeoutError:
+                    # Таймаут ожидаем, продолжаем цикл
+                    pass       
 
 if __name__ == "__main__":
     asyncio.run(main())
