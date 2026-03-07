@@ -27,7 +27,7 @@ async def main():
 
     async with KworkAPI(cookies=kwork_settings.cookies) as api:
         async with TelegramClient(telegram_setings.bot_token) as telegram:
-            service = ProjectMonitorService(api, telegram, telegram_setings.chat_id)
+            service = ProjectMonitorService(api, telegram, telegram_setings.chat_ids)
 
             while not shutdown_event.is_set():
                 try:
@@ -42,7 +42,8 @@ async def main():
                     )
                 except asyncio.TimeoutError:
                     # Таймаут ожидаем, продолжаем цикл
-                    pass       
+                    pass
+
 
 if __name__ == "__main__":
     asyncio.run(main())

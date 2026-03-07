@@ -8,7 +8,7 @@ class KworkSettings(BaseSettings):
 
 class TelegramSettings(BaseSettings):
     bot_token: str
-    chat_id: int
+    chat_ids: list[int]
 
 
 class AppSettings(BaseSettings):
