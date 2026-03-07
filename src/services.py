@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Iterable
 
 from src.api import KworkAPI
 from src.models import Want
@@ -13,18 +14,23 @@ class ProjectMonitorService:
         self,
         api: KworkAPI,
         telegram: TelegramClient,
-        chat_id: int | str,
+        chat_ids: Iterable[int | str],
         concurrency: int = 5,
     ):
         self.api = api
         self.telegram = telegram
-        self.chat_id = chat_id
+        self.chat_ids = list(chat_ids)
         self.semaphore = asyncio.Semaphore(concurrency)
 
     async def _notify_one(self, want: Want) -> int | None:
         async with self.semaphore:
             try:
-                await self.telegram.send_want(want, self.chat_id)
+                await asyncio.gather(
+                    *(
+                        self.telegram.send_want(want, chat_id)
+                        for chat_id in self.chat_ids
+                    )
+                )
                 return want.id
             except Exception:
                 logger.exception("Не удалось уведомить %s", want.id)
